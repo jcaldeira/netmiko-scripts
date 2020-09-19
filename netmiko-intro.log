@@ -1,0 +1,40 @@
+2020-09-18 14:46:35,420:DEBUG:__main__:{'device_type': 'cisco_xr', 'ip': '10.254.98.22', 'username': 'jcaldeira', 'password': 'CLD@caldeira0'}
+2020-09-18 14:49:08,650:DEBUG:__main__:equipment: {'device_type': 'cisco_xr', 'ip': '10.254.98.22', 'username': 'jcaldeira', 'password': 'CLD@caldeira0'}
+2020-09-18 14:53:08,027:DEBUG:__main__:equipment: {'device_type': 'cisco_xr', 'ip': '10.254.98.22', 'username': 'jcaldeira', 'password': 'CLD@caldeira0'}
+2020-09-18 14:53:50,448:DEBUG:__main__:equipment: {'device_type': 'cisco_xr', 'ip': '10.254.98.22', 'username': 'jcaldeira', 'password': 'CLD@caldeira0'}
+2020-09-18 14:54:22,566:DEBUG:__main__:equipment: {'device_type': 'cisco_xr', 'ip': '10.254.98.22', 'username': 'jcaldeira', 'password': 'CLD@caldeira0'}
+2020-09-18 14:54:51,285:DEBUG:__main__:equipment = {'device_type': 'cisco_xr', 'ip': '10.254.98.22', 'username': 'jcaldeira', 'password': 'CLD@caldeira0'}
+2020-09-18 20:47:50,502:ERROR:__main__:Error reading SSH protocol banner
+Traceback (most recent call last):
+  File "C:\Program Files (x86)\Python38-32\lib\site-packages\paramiko\transport.py", line 2211, in _check_banner
+    buf = self.packetizer.readline(timeout)
+  File "C:\Program Files (x86)\Python38-32\lib\site-packages\paramiko\packet.py", line 380, in readline
+    buf += self._read_timeout(timeout)
+  File "C:\Program Files (x86)\Python38-32\lib\site-packages\paramiko\packet.py", line 609, in _read_timeout
+    raise EOFError()
+EOFError
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "c:/Users/xgftb21/Documents/GitHub/netmiko-learning/netmiko-intro.py", line 61, in main
+    with netmiko.ConnectHandler(**equipment) as connection:
+  File "C:\Program Files (x86)\Python38-32\lib\site-packages\netmiko\ssh_dispatcher.py", line 302, in ConnectHandler
+    return ConnectionClass(*args, **kwargs)
+  File "C:\Program Files (x86)\Python38-32\lib\site-packages\netmiko\base_connection.py", line 344, in __init__
+    self._open()
+  File "C:\Program Files (x86)\Python38-32\lib\site-packages\netmiko\base_connection.py", line 349, in _open
+    self.establish_connection()
+  File "C:\Program Files (x86)\Python38-32\lib\site-packages\netmiko\cisco\cisco_xr.py", line 9, in establish_connection
+    super().establish_connection(width=511, height=511)
+  File "C:\Program Files (x86)\Python38-32\lib\site-packages\netmiko\base_connection.py", line 918, in establish_connection
+    self.remote_conn_pre.connect(**ssh_connect_params)
+  File "C:\Program Files (x86)\Python38-32\lib\site-packages\paramiko\client.py", line 406, in connect
+    t.start_client(timeout=timeout)
+  File "C:\Program Files (x86)\Python38-32\lib\site-packages\paramiko\transport.py", line 660, in start_client
+    raise e
+  File "C:\Program Files (x86)\Python38-32\lib\site-packages\paramiko\transport.py", line 2039, in run
+    self._check_banner()
+  File "C:\Program Files (x86)\Python38-32\lib\site-packages\paramiko\transport.py", line 2215, in _check_banner
+    raise SSHException(
+paramiko.ssh_exception.SSHException: Error reading SSH protocol banner
