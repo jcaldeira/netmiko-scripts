@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import threading, re, xlrd, xlutils, xlwt, datetime, os, logging
+import threading, re, xlrd, xlutils, xlwt, re, datetime, os, logging
 from netmiko.ssh_exception import  NetMikoTimeoutException
 from paramiko.ssh_exception import SSHException
 from netmiko.ssh_exception import  AuthenticationException
@@ -21,7 +21,7 @@ datatemp = str(datetime.today())
 datatemp = re.search('(\S+)-(\S+)-(\S+)', datatemp)
 data = datatemp.group(3) + '-' + datatemp.group(2) + '-' + datatemp.group(1)
 
-wb = xlrd.open_workbook('C:\\Users\\xgftb21\\Documents\\GitHub\\netmiko-learning\\Rui Pereira\\Cadastro.xlsm') # Source Excel
+wb = xlrd.open_workbook('D:\\rpereira\\Cadastro.xlsm') # Source Excel
 wbbook = wb.sheet_by_name(u'Cadastro') # Sheet source excel
 
 row = 1 # Numero da linha onde comecam os dados

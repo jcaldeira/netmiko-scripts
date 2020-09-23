@@ -1,0 +1,8 @@
+SITE2240-RIS-P# sh ip helper-address
+Interface                  Helper-Address  VPN VRG Name             VRG State
+Vlan20                     10.95.2.210     0   None                 Unknown
+                           10.20.132.6     0   None                 Unknown
+
+SITE2240-RIS-P# sh run | i ip helper-address
+ ip helper-address 10.95.2.210
+ ip helper-address 10.20.132.6
