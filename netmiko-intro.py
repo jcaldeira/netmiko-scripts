@@ -96,10 +96,11 @@ def connect_and_commands(equipment):
 
 		logger.debug(f're_result_1: {re_result_1}')
 
-		for i in range(0, len(re_result_1)):
-			with open('output.txt', 'a') as f:
-				logger.debug(f"{equipment['secret']} ({equipment['ip']}): {re_result_1[i]}")
-				f.write(f"{equipment['secret']} ({equipment['ip']}): {re_result_1[i]}\n")
+		if re_result_1 is not None:
+			for i in range(0, len(re_result_1)):
+				with open('output.txt', 'a') as f:
+					logger.debug(f"{equipment['secret']} ({equipment['ip']}): {re_result_1[i]}")
+					f.write(f"{equipment['secret']} ({equipment['ip']}): {re_result_1[i]}\n")
 
 
 	except NetMikoTimeoutException:
