@@ -48,27 +48,66 @@ def env_exec():
 	password = open('pwd_tacacs_ris.txt','rt').read()
 
 	device_list = []
-	# xl_row = 1 # counter not in use
+
+	relay_ips = {
+		'ars_norte_ex_idt': ['10.177.100.203'],
+		'ars_norte_NAO_ex_idt': ['10.95.2.210', '10.20.132.6'],
+		'ars_norte_dados_sicad_e_ris': ['10.95.65.128', '10.95.65.129']
+	}
+
 
 	for row in range(1, source_sheet_xl.nrows):
 		if source_sheet_xl.cell_value(row, 5) == "Migrado" and source_sheet_xl.cell_value(row, 18) == "ARS Norte":
-			site_id = source_sheet_xl.cell_value(row, 0)
-			management_ip = source_sheet_xl.cell_value(row, 8)
-			# nome = source_sheet_xl.cell_value(row, 2)
-			# hostname = source_sheet_xl.cell_value(row, 7)
-			# cc = source_sheet_xl.cell_value(row, 6)
+			if source_sheet_xl.cell_value(row, 1) == 'ARS Norte - Unidades EX-IDT':
+				site_id = source_sheet_xl.cell_value(row, 0)
+				management_ip = source_sheet_xl.cell_value(row, 8)
+				# nome = source_sheet_xl.cell_value(row, 2)
+				# hostname = source_sheet_xl.cell_value(row, 7)
+				# cc = source_sheet_xl.cell_value(row, 6)
 
 			# xl_row += 1
 
-			equipment = {
-				'device_type': 'cisco_xr',
-				'ip': management_ip,
-				'username': username,
-				'password': password,
-				'secret': site_id
-			}
+				equipment = {
+					'device_type': 'cisco_xr',
+					'ip': management_ip,
+					'username': username,
+					'password': password,
+					'secret': site_id,
+					'alt_key_file': relay_ips['ars_norte_ex_idt']
+				}
 
-			device_list.append(equipment)
+				device_list.append(equipment)
+
+			elif source_sheet_xl.cell_value(row, 1) == 'ARS Norte':
+				site_id = source_sheet_xl.cell_value(row, 0)
+				management_ip = source_sheet_xl.cell_value(row, 8)
+
+				equipment = {
+					'device_type': 'cisco_xr',
+					'ip': management_ip,
+					'username': username,
+					'password': password,
+					'secret': site_id,
+					'alt_key_file': relay_ips['ars_norte_NAO_ex_idt']
+				}
+
+				device_list.append(equipment)
+
+			elif source_sheet_xl.cell_value(row, 1) == 'SICAD':
+				site_id = source_sheet_xl.cell_value(row, 0)
+				management_ip = source_sheet_xl.cell_value(row, 8)
+
+				equipment = {
+					'device_type': 'cisco_xr',
+					'ip': management_ip,
+					'username': username,
+					'password': password,
+					'secret': site_id,
+					'alt_key_file': relay_ips['ars_norte_dados_sicad_e_ris']
+				}
+
+				device_list.append(equipment)
+
 
 
 	logger.debug(f'device_list: {device_list}')
@@ -84,22 +123,29 @@ def env_exec():
 
 def connect_and_commands(equipment):
 	logger.info(f"Accessing: {equipment['secret']} ({equipment['ip']})")
+	if len(equipment['alt_key_file'] > 1):
+		command_string = [
+							'int vlan20',
+							f"ip helper-address {equipment['alt_key_file'][0]}",
+							f"ip helper-address {equipment['alt_key_file'][1]}"
+						]
+	elif len(equipment['alt_key_file'] == 1):
+		command_string = [
+							'int vlan20',
+							f"ip helper-address {equipment['alt_key_file']}",
+						]
+
 	try:
 		with netmiko.ConnectHandler(**equipment) as connection:
-			prompt = connection.find_prompt()
-			command_string = 'show run | i ip helper-address'
-			output = connection.send_command(command_string = command_string, expect_string = prompt)
 
-		pattern_to_search = r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
+			output = connection.send_config_set(command_string = command_string)
 
-		re_result_1 = re.findall(pattern_to_search, output)
-
-		logger.debug(f're_result_1: {re_result_1}')
 
 		for i in range(0, len(re_result_1)):
 			with open('output.txt', 'a') as f:
 				logger.debug(f"{equipment['secret']} ({equipment['ip']}): {re_result_1[i]}")
 				f.write(f"{equipment['secret']} ({equipment['ip']}): {re_result_1[i]}\n")
+
 
 
 	except NetMikoTimeoutException:
