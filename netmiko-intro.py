@@ -45,7 +45,7 @@ def env_exec():
 	source_sheet_xl = source_xl.sheet_by_name('Cadastro')
 
 	username = 'jcaldeira'
-	password = open('pwd_tacacs_ris.txt','rt').read()
+	password = open('pwd_tacacs_ris.txt','r').read()
 
 	device_list = []
 	# xl_row = 1 # counter not in use
