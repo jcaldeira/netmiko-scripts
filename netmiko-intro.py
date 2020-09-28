@@ -86,9 +86,8 @@ def connect_and_commands(equipment):
 	logger.info(f"Accessing: {equipment['secret']} ({equipment['ip']})")
 	try:
 		with netmiko.ConnectHandler(**equipment) as connection:
-			prompt = connection.find_prompt()
 			command_string = 'show run | i ip helper-address'
-			output = connection.send_command(command_string = command_string, expect_string = prompt)
+			output = connection.send_command(command_string = command_string)
 
 		pattern_to_search = r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
 
