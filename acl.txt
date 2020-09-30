@@ -1,0 +1,13 @@
+SITE0007-RIS-B# sh access-lists Gestao_PT
+Standard IP access list Gestao_PT
+    40 permit 10.252.0.0, wildcard bits 0.3.255.255 (32 matches)
+    50 permit 169.254.254.0, wildcard bits 0.0.0.3
+    60 permit 10.14.69.252, wildcard bits 0.0.0.3
+    70 permit 100.126.126.0, wildcard bits 0.0.1.255 (24 matches)
+SITE0007-RIS-B#
+
+
+
+
+
+

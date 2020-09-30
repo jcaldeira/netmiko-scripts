@@ -46,30 +46,9 @@ def env_exec():
 	password = open('pwd_tacacs_ris.txt','r').read()
 
 	device_list = []
-	# xl_row = 1 # counter not in use
-
-	# for row in range(1, source_sheet_xl.nrows):
-	# 	if source_sheet_xl.cell_value(row, 5) == "Migrado":
-	# 		site_id = source_sheet_xl.cell_value(row, 0)
-	# 		management_ip = source_sheet_xl.cell_value(row, 8)
-	# 		# nome = source_sheet_xl.cell_value(row, 2)
-	# 		# hostname = source_sheet_xl.cell_value(row, 7)
-	# 		# cc = source_sheet_xl.cell_value(row, 6)
-
-	# 		# xl_row += 1
-
-	# 		equipment = {
-	# 			'device_type': 'cisco_xr',
-	# 			'ip': management_ip,
-	# 			'username': username,
-	# 			'password': password,
-	# 			'secret': site_id
-	# 		}
-
-	# 		device_list.append(equipment)
 
 	equipment = {
-	'device_type': 'cisco_xr',
+	'device_type': 'cisco_xe',
 	'ip': '10.254.103.81',
 	'username': username,
 	'password': password,
@@ -93,13 +72,21 @@ def env_exec():
 def connect_and_commands(equipment):
 	logger.info(f"Accessing: {equipment['secret']} ({equipment['ip']})")
 	try:
-		with netmiko.ConnectHandler(**equipment) as connection:
-			command_string = 'sh ip access-list standart Gestao_PT'
-			output = connection.send_command(command_string = command_string)
+		# with netmiko.ConnectHandler(**equipment) as connection:
+		# 	command_string = 'sh ip access-list standart Gestao_PT'
+			# output = connection.send_command(command_string = command_string)
+		output = [
+			'Standard IP access list Gestao_PT',
+			'	05 remark "xpto"',
+			'	40 permit 10.252.0.0, wildcard bits 0.3.255.255 (32 matches)',
+			'	50 permit 169.254.254.0, wildcard bits 0.0.0.3',
+			'	60 permit 10.14.69.252, wildcard bits 0.0.0.3',
+			'	70 permit 100.126.126.0, wildcard bits 0.0.1.255 (24 matches)'
+		]
 
 		pattern_to_search = r'\t05 '
 
-		re_result_1 = re.findall(pattern_to_search, output)
+		re_result_1 = re.search(pattern_to_search, output)
 
 		logger.debug(f're_result_1: {re_result_1}')
 

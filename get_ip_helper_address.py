@@ -61,7 +61,7 @@ def env_exec():
 			# xl_row += 1
 
 			equipment = {
-				'device_type': 'cisco_xr',
+				'device_type': 'cisco_xe',
 				'ip': management_ip,
 				'username': username,
 				'password': password,
