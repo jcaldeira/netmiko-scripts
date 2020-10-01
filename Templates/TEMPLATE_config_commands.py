@@ -11,14 +11,13 @@ from paramiko.ssh_exception import SSHException
 
 
 # ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ Logging ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-
-logger = logging.getLogger(__name__) # criar um logger específico deste módulo
-logger.setLevel(logging.DEBUG) # definir o nível de verbosidade do logger
+main_logger = logging.getLogger(__name__) # criar um logger específico deste módulo
+main_logger.setLevel(logging.DEBUG) # definir o nível de verbosidade do logger
 
 file_formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(name)s:%(message)s') # criar o formato dos logs a aplicar no file_formatter
 steam_formatter = logging.Formatter('%(message)s') # criar o formato dos logs a aplicar no stream_handler
 
-file_handler = logging.FileHandler('netmiko-intro.log') # criar ficheiro de logs
+file_handler = logging.FileHandler('change_ip_helper_address_single.log') # criar ficheiro de logs
 file_handler.setLevel(logging.DEBUG) # definir o nível de verbosidade do file_handler
 file_handler.setFormatter(file_formatter) # aplicar o formato de log anteriormente criado
 
@@ -26,9 +25,11 @@ stream_handler = logging.StreamHandler() # criar stream_handler que serve para m
 stream_handler.setLevel(logging.INFO) # definir o nível de verbosidade do stream_handler
 stream_handler.setFormatter(steam_formatter) # aplicar o formato de log anteriormente criado
 
-logger.addHandler(file_handler) # aplicar file_handler ao logger
-logger.addHandler(stream_handler) # aplicar stream_handler ao logger
+main_logger.addHandler(file_handler) # aplicar file_handler ao logger
+main_logger.addHandler(stream_handler) # aplicar stream_handler ao logger
 
+logging.basicConfig(filename='Logs\\netmiko.log', level=logging.DEBUG)
+logger = logging.getLogger("netmiko")
 # ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ End Logging ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
 
@@ -41,7 +42,7 @@ def cls():
 
 
 def env_exec():
-	source_xl = xlrd.open_workbook('D:\\jcaldeira\\PycharmProjects\\netmiko-intro\\Cadastro.xlsm')
+	source_xl = xlrd.open_workbook('D:\\jcaldeira\\Python Projects\\netmiko-intro\\Cadastro.xlsm')
 	source_sheet_xl = source_xl.sheet_by_name('Cadastro')
 
 	username = 'jcaldeira'
@@ -70,49 +71,40 @@ def env_exec():
 
 			device_list.append(equipment)
 
-
-	logger.debug(f'device_list: {device_list}')
-
+	main_logger.debug(f'device_list: {equipment}')
 
 	with concurrent.futures.ThreadPoolExecutor() as executor:
 		executor.map(connect_and_commands, device_list)
-
-	return len(device_list)
 
 
 
 
 def connect_and_commands(equipment):
-	logger.info(f"Accessing: {equipment['secret']} ({equipment['ip']})")
+	main_logger.info(f"Accessing: {equipment['secret']} ({equipment['ip']})")
 	try:
 		with netmiko.ConnectHandler(**equipment) as connection:
-			command_string = 'show run | i ip helper-address'
-			output = connection.send_command(command_string = command_string)
+			commands = [
+				'',
+				''
+				]
+			connection.config_mode(pattern = '(config)')
+			connection.send_config_set(config_commands = commands, exit_config_mode = False, enter_config_mode = False)
+			connection.exit_config_mode(pattern = 'SITE')
+			connection.send_command('wr')
 
-		pattern_to_search = r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
-
-		re_result_1 = re.findall(pattern_to_search, output)
-
-		logger.debug(f're_result_1: {re_result_1}')
-
-		if re_result_1 is not None:
-			for i in range(0, len(re_result_1)):
-				with open('output.txt', 'a') as f:
-					logger.debug(f"{equipment['secret']} ({equipment['ip']}): {re_result_1[i]}")
-					f.write(f"{equipment['secret']} ({equipment['ip']}): {re_result_1[i]}\n")
 
 
 	except NetMikoTimeoutException:
-		logger.info(f"Timeout exception on {equipment['secret']} ({equipment['ip']})")
+		main_logger.info(f"Timeout exception on {equipment['secret']} ({equipment['ip']})")
 
 	except AuthenticationException:
-		logger.info(f"Authentication failed on {equipment['secret']} ({equipment['ip']})")
+		main_logger.info(f"Authentication failed on {equipment['secret']} ({equipment['ip']})")
 
 	except SSHException:
-		logger.info(f"Error reading SSH protocol banner on {equipment['secret']} ({equipment['ip']})")
+		main_logger.info(f"Error reading SSH protocol banner on {equipment['secret']} ({equipment['ip']})")
 
 	except:
-		logger.exception(f"An error has occurred on {equipment['secret']} ({equipment['ip']})")
+		main_logger.info(f"An error has occurred on {equipment['secret']} ({equipment['ip']})")
 
 
 
@@ -122,11 +114,10 @@ if __name__ == '__main__':
 	time_start = datetime.datetime.now()
 	perf_counter_start = time.perf_counter()
 
-	num_equips = env_exec()
+	env_exec()
 
 	perf_counter_stop = time.perf_counter()
 	time_stop = datetime.datetime.now()
 
-	logger.info(f'Number of equipments: {num_equips}')
-	logger.info(f'Finished in {round(perf_counter_stop - perf_counter_start, 3)} second(s)')
-	logger.info(f'Started at {time_start} and finished at {time_stop}\n')
+	main_logger.info(f'Finished in {round(perf_counter_stop - perf_counter_start, 3)} second(s)')
+	main_logger.info(f'Started at {time_start} and finished at {time_stop}\n')
