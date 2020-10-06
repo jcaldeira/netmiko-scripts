@@ -69,7 +69,7 @@ def env_exec():
 				'username': username,
 				'password': password,
 				'secret': site_id,
-				'alt_key_file' : ip_lan,
+				'alt_key_file' : ip_lan
 			}
 
 			device_list.append(equipment)
