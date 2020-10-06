@@ -49,10 +49,10 @@ def env_exec():
 
 	equipment = {
 	'device_type': 'cisco_xe',
-	'ip': '10.254.103.81',
+	'ip': '10.254.98.22',
 	'username': username,
 	'password': password,
-	'secret': '1433'
+	'secret': '0931'
 }
 
 	device_list.append(equipment)
@@ -70,7 +70,7 @@ def connect_and_commands(equipment):
 	main_logger.info(f"Accessing: {equipment['secret']} ({equipment['ip']})")
 	try:
 		with netmiko.ConnectHandler(**equipment) as connection:
-			# command_string = 'sh ip access-list standart Gestao_PT'
+			command_string = 'sh ip access-list standart Gestao_PT'
 			output = connection.send_command(command_string = command_string)
 		output = [
 			'Standard IP access list Gestao_PT',

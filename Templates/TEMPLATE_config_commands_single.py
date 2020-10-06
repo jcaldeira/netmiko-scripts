@@ -47,10 +47,10 @@ def env_exec():
 
 	equipment = {
 	'device_type': 'cisco_xe',
-	'ip': '',
+	'ip': '10.254.102.141',
 	'username': username,
 	'password': password,
-	'secret': ''
+	'secret': '2640'
 }
 
 	main_logger.debug(f'device_list: {equipment}')
@@ -64,12 +64,12 @@ def connect_and_commands(equipment):
 	main_logger.info(f"Accessing: {equipment['secret']} ({equipment['ip']})")
 	try:
 		with netmiko.ConnectHandler(**equipment) as connection:
-			commands = [
+			config_commands = [
 				'',
 				''
 				]
 			connection.config_mode(pattern = '(config)')
-			connection.send_config_set(config_commands = commands, exit_config_mode = False, enter_config_mode = False)
+			connection.send_config_set(config_commands = config_commands, exit_config_mode = False, enter_config_mode = False)
 			connection.exit_config_mode(pattern = 'SITE')
 			connection.send_command('wr')
 
