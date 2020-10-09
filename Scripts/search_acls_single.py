@@ -10,8 +10,7 @@ from paramiko.ssh_exception import SSHException
 
 
 # ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ Logging ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-script_name = os.path.splitext(__file__)
-script_name = os.path.basename(script_name[0])
+script_name = os.path.basename(os.path.splitext(__file__)[0])
 
 if __name__ == "__main__":
     main_logger = logging.getLogger(
