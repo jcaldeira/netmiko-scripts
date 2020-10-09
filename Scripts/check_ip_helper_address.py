@@ -2,7 +2,6 @@ import sys, subprocess, re, time, datetime, os
 import logging, concurrent.futures
 import paramiko, netmiko
 import xlrd
-
 # ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ Error Handeling Imports ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 from netmiko.ssh_exception import NetMikoTimeoutException
 from netmiko.ssh_exception import AuthenticationException
@@ -54,7 +53,6 @@ logger = logging.getLogger("netmiko")
 # ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬ End Logging ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
 
-
 def cls():
     if sys.platform in ("linux", "darwin"):
         subprocess.run(["clear"])
@@ -66,7 +64,6 @@ def env_exec():
     source_xl = xlrd.open_workbook(
         "D:\\jcaldeira\\Python Projects\\netmiko-intro\\Cadastro.xlsm"
     )
-    # source_xl = xlrd.open_workbook("C:\\Users\\joao.caldeira.ext\\Documents\\GitHub\\netmiko-learning\\Cadastro.xlsm")
     source_sheet_xl = source_xl.sheet_by_name("Cadastro")
 
     username = "jcaldeira"
@@ -82,7 +79,6 @@ def env_exec():
         ):
             site_id = source_sheet_xl.cell_value(row, 0)
             management_ip = source_sheet_xl.cell_value(row, 8)
-            ip_lan = source_sheet_xl.cell_value(row, 13)
             # nome = source_sheet_xl.cell_value(row, 2)
             # hostname = source_sheet_xl.cell_value(row, 7)
             # cc = source_sheet_xl.cell_value(row, 6)
@@ -95,7 +91,6 @@ def env_exec():
                 "username": username,
                 "password": password,
                 "secret": site_id,
-                "alt_key_file": ip_lan,
             }
 
             device_list.append(equipment)
@@ -110,60 +105,55 @@ def env_exec():
 
 def connect_and_commands(equipment):
     main_logger.info(f"Accessing: {equipment['secret']} ({equipment['ip']})")
-    ip_helper_address_1 = "10.30.2.151"
-    ip_helper_address_2 = "10.30.2.152"
-    regex = equipment["alt_key_file"].split("/")[0][:-1]
+    regexes = {
+        "10.30.2.151",
+        "10.30.2.152",
+    }
 
-    try:
-        with netmiko.ConnectHandler(**equipment) as connection:
-            command_string = f"show ip interface brief | i {regex}"
-            output = connection.send_command(command_string=command_string)
+    with open("Logs\\check_ip_helper_address__ERRO.log", "a") as f_log:
+        with open("Logs\\check_ip_helper_address.txt", "a") as f_txt:
+            try:
+                with netmiko.ConnectHandler(**equipment) as connection:
+                    commands = "show run | i ip helper-address"
+                    output = connection.send_command(command_string=commands)
 
-            pattern_to_search = fr"(\S+)\s+{regex}"
+                    pattern_to_search = r"(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})"
+                    re_result = set(re.findall(pattern_to_search, output))
 
-            re_result_1 = re.search(pattern_to_search, output)
-            int_lan = re_result_1.group(1)
+                    list_compare = regexes.intersection(re_result)
 
-            if re_result_1:
-                config_commands = [
-                    f"int {int_lan}",
-                    f"ip helper-address {ip_helper_address_1}",
-                    f"ip helper-address {ip_helper_address_2}",
-                ]
+                if regexes == list_compare:
+                    f_txt.write(f"{equipment['secret']} ({equipment['ip']}): OK\n")
 
-                connection.config_mode(pattern="(config)")
-                connection.send_config_set(
-                    config_commands=config_commands,
-                    exit_config_mode=False,
-                    enter_config_mode=False,
-                )
-                connection.exit_config_mode()
-                connection.send_command("wr")
+                elif regexes != list_compare:
+                    diff_str = ""
+                    for item in regexes.difference(re_result):
+                        diff_str = f"{diff_str} {item} "
+                    f_txt.write(
+                        f"{equipment['secret']} ({equipment['ip']}): NOK: {diff_str}\n"
+                    )
 
-            with open("Logs\\change_ip_helper_address__ALTERADO.txt", "a") as f:
-                f.write(f"{equipment['secret']} ({equipment['ip']}): Alterado\n")
+            except NetMikoTimeoutException as exep:
+                # main_logger.exception(f"Timeout exception on {equipment['secret']} ({equipment['ip']})")
+                main_logger.info(f" {exep}: {equipment['secret']} ({equipment['ip']})")
+                # with open("Logs\\check_ip_helper_address__ERRO.log", "a") as f:
+                f_log.write(f"{equipment['secret']} ({equipment['ip']}): {exep}\n")
 
-    except NetMikoTimeoutException:
-        # main_logger.exception(f"Timeout exception on {equipment['secret']} ({equipment['ip']})")
-        main_logger.info(f" {exep}: {equipment['secret']} ({equipment['ip']})")
-        with open("Logs\\change_ip_helper_address__NÃO-ALTERADO.txt", "a") as f:
-            f.write(f"{equipment['secret']} ({equipment['ip']}): {exep}\n")
+            except AuthenticationException as exep:
+                # main_logger.exception(f"Authentication failed on {equipment['secret']} ({equipment['ip']})")
+                main_logger.info(f" {exep}: {equipment['secret']} ({equipment['ip']})")
+                # with open("Logs\\check_ip_helper_address__ERRO.log", "a") as f:
+                f_log.write(f"{equipment['secret']} ({equipment['ip']}): {exep}\n")
 
-    except AuthenticationException:
-        # main_logger.exception(f"Authentication failed on {equipment['secret']} ({equipment['ip']})")
-        main_logger.info(f" {exep}: {equipment['secret']} ({equipment['ip']})")
-        with open("Logs\\change_ip_helper_address__NÃO-ALTERADO.txt", "a") as f:
-            f.write(f"{equipment['secret']} ({equipment['ip']}): {exep}\n")
+            except SSHException as exep:
+                # main_logger.exception(f"Error reading SSH protocol banner on {equipment['secret']} ({equipment['ip']})")
+                main_logger.info(f" {exep}: {equipment['secret']} ({equipment['ip']})")
+                # with open("Logs\\check_ip_helper_address__ERRO.log", "a") as f:
+                f_log.write(f"{equipment['secret']} ({equipment['ip']}): {exep}\n")
 
-    except SSHException as exep:
-        # main_logger.exception(f"Error reading SSH protocol banner on {equipment['secret']} ({equipment['ip']})")
-        main_logger.info(f" {exep}: {equipment['secret']} ({equipment['ip']})")
-        with open("Logs\\change_ip_helper_address__NÃO-ALTERADO.txt", "a") as f:
-            f.write(f"{equipment['secret']} ({equipment['ip']}): {exep}\n")
-
-    except:
-        # main_logger.info(f"An error has occurred on {equipment['secret']} ({equipment['ip']})")
-        main_logger.exception(f" {exep}: {equipment['secret']} ({equipment['ip']})")
+            except:
+                # main_logger.info(f"An error has occurred on {equipment['secret']} ({equipment['ip']})")
+                main_logger.exception(f"{equipment['secret']} ({equipment['ip']})")
 
 
 if __name__ == "__main__":
