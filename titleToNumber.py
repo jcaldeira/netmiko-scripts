@@ -20,4 +20,5 @@ def titleToNumber(s):
 
 
 if __name__ == '__main__':
-	print(titleToNumber(input('Name of the column: ')))
+	while True:
+		print(titleToNumber(input('Name of the column: ')))
