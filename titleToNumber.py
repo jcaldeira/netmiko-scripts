@@ -1,3 +1,9 @@
+# Driver function
+# print(titleToNumber("CDA"));
+
+# This code contributed by Rajput-Ji
+# https://www.geeksforgeeks.org/find-excel-column-number-column-title/
+
 # Python program to return title to result
 # of excel sheet.
 
@@ -12,13 +18,13 @@ def titleToNumber(s):
 
     return result;
 
-# Driver function
-# print(titleToNumber("CDA"));
 
-# This code contributed by Rajput-Ji
-# https://www.geeksforgeeks.org/find-excel-column-number-column-title/
+def main():
+    user_input = input('Name of the column: ')
+	while user_input != 'exit':
+		print(titleToNumber(user_input))
 
 
 if __name__ == '__main__':
-	while True:
-		print(titleToNumber(input('Name of the column: ')))
+    main()
+    
