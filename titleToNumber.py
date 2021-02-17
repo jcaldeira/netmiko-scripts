@@ -19,11 +19,6 @@ def titleToNumber(s):
 # https://www.geeksforgeeks.org/find-excel-column-number-column-title/
 
 
-def main():
-    user_input = input('Name of the column: ')
-	while user_input != 'exit':
-		print(titleToNumber(user_input))
-
-
 if __name__ == '__main__':
-    main()
+	while True:
+		print(titleToNumber(input('Name of the column: ')))
