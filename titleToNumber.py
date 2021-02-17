@@ -21,10 +21,10 @@ def titleToNumber(s):
 
 def main():
     user_input = input('Name of the column: ')
-    while user_input != 'exit':
-        print(titleToNumber(user_input))
+	while user_input != 'exit':
+		print(titleToNumber(user_input))
 
 
 if __name__ == '__main__':
     main()
-
+    
