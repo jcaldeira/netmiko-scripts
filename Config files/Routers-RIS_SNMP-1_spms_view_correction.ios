@@ -1,0 +1,19 @@
+snmp-server group snmpv3_group v3 priv read spms_view
+snmp-server view spms_view internet included
+snmp-server view spms_view at excluded
+snmp-server view spms_view transmission excluded
+snmp-server view spms_view bgp excluded
+snmp-server view spms_view rmon excluded
+snmp-server view spms_view ip.1 excluded
+snmp-server view spms_view ip.20 excluded
+snmp-server view spms_view ip.21 excluded
+snmp-server view spms_view ip.22 excluded
+snmp-server view spms_view ip.23 excluded
+snmp-server view spms_view ipForward excluded
+snmp-server view spms_view ip.25 excluded
+snmp-server view spms_view ip.26 excluded
+snmp-server view spms_view ip.30 excluded
+snmp-server view spms_view ip.32 excluded
+snmp-server view spms_view ip.35 excluded
+snmp-server view spms_view ip.36 excluded
+snmp-server view spms_view ip.37 excluded

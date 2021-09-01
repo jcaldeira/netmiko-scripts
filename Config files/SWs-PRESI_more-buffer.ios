@@ -1,0 +1,3 @@
+! wife long buffer
+lldp run
+logging buffer 81920

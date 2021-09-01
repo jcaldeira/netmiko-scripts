@@ -1,0 +1,6 @@
+no vlan 255
+no int vlan 255
+no ip dhcp pool PC_TECNICO
+default interface gi0/1/1
+int gi0/1/1
+description ### SHUTDOWN ###

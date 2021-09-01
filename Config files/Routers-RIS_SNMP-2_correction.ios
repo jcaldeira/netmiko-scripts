@@ -1,0 +1,6 @@
+! El SNMP Diablo
+lldp run
+no snmp-server group ris2020_ro_user v3 auth
+no snmp-server group ris2020_rw_user v3 auth
+snmp-server host 10.255.255.244 version 3 auth ris2020_rw_user
+snmp-server group ris2020_rw_group v3 priv write ris2020_view
